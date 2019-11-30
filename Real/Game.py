@@ -66,6 +66,8 @@ class Game(arcade.Window):
                 self.bullets.append(bullet)
                 self.recent_fire = self.time
 
+        self.on_collide()
+
         delete_list = []
         for i, bullet in enumerate(self.bullets):
             if bullet.y > 600:
@@ -103,8 +105,8 @@ class Game(arcade.Window):
     def on_collide(self):
         for enemy in self.enemies:
             for bullet in self.bullets:
-                if abs(bullet.x - enemy.x) < (bullet.x + enemy.x) / 2 \
-                        and abs(bullet.y - enemy.y) < (bullet.y + enemy.y) / 2 \
+                if abs(bullet.x - enemy.x) < bullet.size + enemy.size / 2 \
+                        and abs(bullet.y - enemy.y) < bullet.size + enemy.size / 2 \
                         and enemy.visible\
                         and bullet.visible:
                     enemy.visible = False
