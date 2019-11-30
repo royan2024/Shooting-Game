@@ -103,8 +103,8 @@ class Game(arcade.Window):
     def on_collide(self):
         for enemy in self.enemies:
             for bullet in self.bullets:
-                if abs(self.character.x - self.enemies) < (self.character.x + self.enemies) / 2 \
-                        and abs(self.character.y - self.enemies) < (self.character.y + self.enemies) / 2 \
+                if abs(bullet.x - enemy.x) < (bullet.x + enemy.x) / 2 \
+                        and abs(bullet.y - enemy.y) < (bullet.y + enemy.y) / 2 \
                         and enemy.visible\
                         and bullet.visible:
                     enemy.visible = False
