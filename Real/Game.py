@@ -6,8 +6,9 @@
 import arcade
 import random
 from arcade.key import *
+import Bullet
+import Enemy
 from Character import Character
-from Bullet import Bullet
 from Enemy import Enemy
 
 class Game(arcade.Window):
@@ -31,15 +32,20 @@ class Game(arcade.Window):
 
         self.bullets = []
         self.recent_fire = 0
+        self.enemy_bullets = []
+        self.recent_enemy_fire = 0
         self.time = 0
 
     def on_draw(self):
         arcade.start_render()
+        for bullet in self.enemy_bullets:
+            bullet.draw()
         for enemy in self.enemies:
             enemy.draw()
         self.character.draw()
         for bullet in self.bullets:
             bullet.draw()
+
 
     def on_update(self, delta_time: float):
         delta_x = 0
@@ -57,14 +63,24 @@ class Game(arcade.Window):
         for bullet in self.bullets:
             bullet.update(delta_time)
 
+        for bullet in self.enemy_bullets:
+            bullet.update(delta_time)
+
         self.time += delta_time
         if self.pressed[SPACE]:
             if self.recent_fire == 0 or self.recent_fire + self.character.attack_speed < self.time:
                 x = self.character.x
                 y = self.character.y + 15
-                bullet = Bullet(x, y, 5, 400)
+                bullet = Bullet.create_normal_bullet(x, y, (0, 1))
                 self.bullets.append(bullet)
                 self.recent_fire = self.time
+
+        #지금은 적 fire가 임시구현이라 하드코딩
+        if self.recent_enemy_fire + 1 < self.time:
+            self.recent_enemy_fire = self.time
+            for enemy in self.enemies:
+                if enemy.visible:
+                    self.enemy_bullets.extend(enemy.fire())
 
         self.on_collide()
 
@@ -112,11 +128,17 @@ class Game(arcade.Window):
                     enemy.visible = False
                     bullet.visible = False
 
+        for ebullet in self.enemy_bullets:
+            if abs(ebullet.x - self.character.x) < ebullet.size + self.character.x / 2 \
+                        and abs(ebullet.y - self.character.y) < ebullet.size + self.character.x / 2:
+                ebullet.visible = False
+                self.character.visible = False
+
 
 
 
 
 if __name__ == "__main__":
     Game()
-    arcade.set_background_color(arcade.color.BLACK)
+    arcade.set_background_color(arcade.color.WHITE)
     arcade.run()
