@@ -8,12 +8,13 @@ import random
 from arcade.key import *
 import Bullet
 import Enemy
+from Constants import *
 from Character import Character
 from Enemy import Enemy
 
 class Game(arcade.Window):
     def __init__(self):
-        super().__init__(800, 600, "Shooting Game")
+        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Shooting Game")
         self.enemies = []
         for i in range(5):
             x = random.randint(20, 780)
@@ -87,12 +88,21 @@ class Game(arcade.Window):
         delete_list = []
         for i, bullet in enumerate(self.bullets):
             if bullet.y > 600:
-                delete_list.insert(i, 0)
+                delete_list.insert(0, i)
         for i in delete_list:
             bullet = self.bullets[i]
             self.bullets.pop(i)
             del bullet
 
+        delete_list = []
+        for i, bullet in enumerate(self.enemy_bullets):
+            if bullet.x > 800 or bullet.x < 0 or\
+                    bullet.y > 600 or bullet.y < 0:
+                delete_list.insert(0, i)
+        for i in delete_list:
+            bullet = self.enemy_bullets[i]
+            self.enemy_bullets.pop(i)
+            del bullet
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == LEFT:
