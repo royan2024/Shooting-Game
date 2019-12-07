@@ -21,7 +21,7 @@ class Game(arcade.Window):
             enemy = Enemy(x, y)
             self.enemies.append(enemy)
 
-        self.character = Character(400, 50, 0.3)
+        self.character = Character(400, 50)
         self.pressed = {
             LEFT: False,
             RIGHT: False,
@@ -129,8 +129,8 @@ class Game(arcade.Window):
                     bullet.visible = False
 
         for ebullet in self.enemy_bullets:
-            if abs(ebullet.x - self.character.x) < ebullet.size + self.character.x / 2 \
-                        and abs(ebullet.y - self.character.y) < ebullet.size + self.character.x / 2:
+            if abs(ebullet.x - self.character.x) < ebullet.size + self.character.size / 2 \
+                        and abs(ebullet.y - self.character.y) < ebullet.size + self.character.size / 2:
                 ebullet.visible = False
                 self.character.visible = False
 

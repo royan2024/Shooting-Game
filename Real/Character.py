@@ -1,16 +1,19 @@
 import arcade
 
 class Character:
-    def __init__(self, x, y, attack_speed):
+    def __init__(self, x, y, size=20, attack_speed=0.3):
         self.x = x
         self.y = y
+        self.size = size
         self.attack_speed = attack_speed
-        #self.sprite = arcade.Sprite("resources/yumdda.png", float(1/66))
+        self.visible = True
+        self.sprite = arcade.Sprite("resources/yumdda.png", float(1/66))
 
 
     def draw(self):
-        #self.sprite.draw()
-        arcade.draw_rectangle_filled(self.x, self.y, 20, 20, arcade.color.BLUE)
+        if self.visible:
+            self.sprite.draw()
+            #arcade.draw_rectangle_filled(self.x, self.y, self.size, self.size, arcade.color.BLUE)
 
     def update(self, delta_x, delta_y):
         self.x += delta_x
