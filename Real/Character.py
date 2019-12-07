@@ -8,6 +8,7 @@ class Character:
         self.attack_speed = attack_speed
         self.visible = True
         self.sprite = arcade.Sprite("resources/yumdda.png", float(1/66))
+        self.sprite.position = (self.x, self.y)
 
 
     def draw(self):
@@ -18,3 +19,5 @@ class Character:
     def update(self, delta_x, delta_y):
         self.x += delta_x
         self.y += delta_y
+        self.sprite.position = (self.x, self.y)
+
