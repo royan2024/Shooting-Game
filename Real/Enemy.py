@@ -31,17 +31,15 @@ class Enemy:
 
    def update(self, delta_time):
        self.x += 0.5 * self.acc[0] * delta_time**2
-       self.x += 0.5 * self.acc[1] * delta_time**2
+       self.y += 0.5 * self.acc[1] * delta_time**2
        if self.x > SCREEN_WIDTH:
            self.x = SCREEN_WIDTH
            self.acc = (self.acc[0] * -1, self.acc[1])
-           #self.acc[0] = self.acc[1]
-           #self.acc[1] = self.acc[0]
+
        if self.x < 0:
            self.x = 0
            self.acc = (self.acc[0] * -1, self.acc[1])
-           #self.acc[0] = self.acc[1]
-           #self.acc[1] = self.acc[0]
+
        if self.y > SCREEN_HEIGHT:
            self.y = SCREEN_HEIGHT
            self.acc = (self.acc[0], self.acc[1] * -1)

@@ -5,8 +5,6 @@
 
 import arcade
 import random
-from arcade.key import *
-from arcade import MOUSE_BUTTON_LEFT
 import Bullet
 import Enemy
 from Constants import *
@@ -33,6 +31,7 @@ class Game(arcade.Window):
        self.enemy_bullets = []
        self.recent_enemy_fire = 0
        self.time = 0
+       self.finished = False
 
    def on_draw(self):
        arcade.start_render()
@@ -48,15 +47,16 @@ class Game(arcade.Window):
    def on_update(self, delta_time: float):
        delta_x = 0
        delta_y = 0
-       if check_pressed("left", self.pressed):
-           delta_x -= 5
-       if check_pressed("right", self.pressed):
-           delta_x += 5
-       if check_pressed("up", self.pressed):
-           delta_y += 5
-       if check_pressed("down", self.pressed):
-           delta_y -= 5
-       self.character.update(delta_x, delta_y)
+       if not self.finished:
+           if check_pressed("left", self.pressed):
+               delta_x -= 5
+           if check_pressed("right", self.pressed):
+               delta_x += 5
+           if check_pressed("up", self.pressed):
+               delta_y += 5
+           if check_pressed("down", self.pressed):
+               delta_y -= 5
+           self.character.update(delta_x, delta_y)
 
        for bullet in self.bullets:
            bullet.update(delta_time)
@@ -68,7 +68,7 @@ class Game(arcade.Window):
            enemy.update(delta_time)
 
        self.time += delta_time
-       if check_pressed("shoot", self.pressed):
+       if check_pressed("shoot", self.pressed) and not self.finished:
            if self.recent_fire == 0 or self.recent_fire + self.character.attack_speed < self.time:
                x = self.character.x
                y = self.character.y + 15
@@ -136,6 +136,7 @@ class Game(arcade.Window):
                        and abs(ebullet.y - self.character.y) < ebullet.size + self.character.size / 2:
                ebullet.visible = False
                self.character.visible = False
+               self.finished = True
 
 
 
