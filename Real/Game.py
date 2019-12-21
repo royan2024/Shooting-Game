@@ -64,8 +64,9 @@ class Game(arcade.Window):
        for bullet in self.enemy_bullets:
            bullet.update(delta_time)
 
-       for enemy in self.enemies:
-           enemy.update(delta_time)
+       if not self.finished:
+           for enemy in self.enemies:
+               enemy.update(delta_time)
 
        self.time += delta_time
        if check_pressed("shoot", self.pressed) and not self.finished:
@@ -77,11 +78,12 @@ class Game(arcade.Window):
                self.recent_fire = self.time
 
        #지금은 적 fire가 임시구현이라 하드코딩
-       if self.recent_enemy_fire + 1 < self.time:
-           self.recent_enemy_fire = self.time
-           for enemy in self.enemies:
-               if enemy.visible:
-                   self.enemy_bullets.extend(enemy.fire())
+       if not self.finished:
+           if self.recent_enemy_fire + 1 < self.time:
+               self.recent_enemy_fire = self.time
+               for enemy in self.enemies:
+                   if enemy.visible:
+                       self.enemy_bullets.extend(enemy.fire())
 
        self.on_collide()
 
