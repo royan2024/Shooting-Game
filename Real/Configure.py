@@ -7,7 +7,8 @@ BEHAVIOR = {
    "right": [D, RIGHT],
    "up": [W, UP],
    "down": [S, DOWN],
-   "shoot": [MOUSE_BUTTON_LEFT, SPACE]
+   "shoot": [MOUSE_BUTTON_LEFT, SPACE],
+   "r": [R]
 }
 
 def check_pressed(key, pressed):

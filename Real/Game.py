@@ -12,6 +12,7 @@ from Character import Character
 from Configure import *
 from Enemy import Enemy
 from Timer import Timer
+from ScoreCalculator import ScoreCalculator
 
 class Game(arcade.Window):
     def __init__(self):
@@ -33,6 +34,8 @@ class Game(arcade.Window):
         self.recent_enemy_fire = 0
         self.timer = Timer(10, SCREEN_HEIGHT - 30)
         self.time = 0
+        self.score = ScoreCalculator()
+        self.total_score = 0
         self.finished = False
 
     def on_draw(self):
@@ -45,6 +48,36 @@ class Game(arcade.Window):
         for bullet in self.bullets:
             bullet.draw()
         self.timer.draw()
+
+        arcade.draw_text(
+            "Score: %6d" % (self.score.calculate(self.timer.time, False)),
+            SCREEN_WIDTH - 10,
+            SCREEN_HEIGHT - 30,
+            arcade.color.BLACK,
+            font_size=20,
+            align="right",
+            anchor_x="right"
+        )
+
+        if self.finished:
+            arcade.draw_text(
+                str("Play Again?"),
+                SCREEN_WIDTH / 2,
+                SCREEN_HEIGHT - 400,
+                arcade.color.BLACK,
+                font_size=40,
+                align="center",
+                anchor_x="center"
+            )
+            arcade.draw_text(
+                str(self.total_score),
+                SCREEN_WIDTH / 2,
+                SCREEN_HEIGHT - 200,
+                arcade.color.BLACK,
+                font_size=40,
+                align="center",
+                anchor_x="center"
+            )
 
 
     def on_update(self, delta_time: float):
@@ -92,6 +125,7 @@ class Game(arcade.Window):
                         self.enemy_bullets.extend(enemy.fire())
 
         self.on_collide()
+        self.check_finish()
 
         delete_list = []
         for i, bullet in enumerate(self.bullets):
@@ -111,6 +145,7 @@ class Game(arcade.Window):
             bullet = self.enemy_bullets[i]
             self.enemy_bullets.pop(i)
             del bullet
+
 
     def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
         self.mouse_position = (x, y)
@@ -135,8 +170,12 @@ class Game(arcade.Window):
                         and enemy.visible \
                         and bullet.visible:
                     enemy.hp -= 1
+                    if not self.finished:
+                        self.score.hit += 1
                     if enemy.hp == 0:
                         enemy.visible = False
+                        if not self.finished:
+                            self.score.kill += 1
                     bullet.visible = False
 
         for ebullet in self.enemy_bullets:
@@ -144,7 +183,37 @@ class Game(arcade.Window):
                     and abs(ebullet.y - self.character.y) < ebullet.size + self.character.size / 2:
                 ebullet.visible = False
                 self.character.visible = False
-                self.finished = True
+
+    def check_finish(self):
+        if self.finished:
+            return
+        is_win = True
+        for enemy in self.enemies:
+            is_win = is_win and not enemy.visible
+        if is_win:
+            self.finished = True
+            self.total_score += self.score.calculate(self.timer.time, is_win)
+
+        if not self.character.visible:
+            self.finished = True
+            self.total_score += self.score.calculate(self.timer.time, False)
+
+    def reset(self):
+        if self.finished:
+            for enemy in self.enemies:
+                if enemy.visible:
+                    enemy.visible = False
+            for bullet in self.bullets:
+                if bullet.visible:
+                    bullet.visible = False
+            for ebullet in self.enemy_bullets:
+                if ebullet.visible:
+                    ebullet.visible = False
+            if self.character.visible:
+                self.character.visible = False
+            if check_pressed("r", self.pressed):
+                self.on_draw()
+
 
 
 
