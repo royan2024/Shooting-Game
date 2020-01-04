@@ -7,9 +7,13 @@ import Bullet
 from Constants import *
 from Configure import *
 import arcade
+from Scene.BaseScene import BaseScene
+from Scene.StartScene import StartScene
 
-class MainScene:
+class MainScene(BaseScene):
     def __init__(self):
+        super().__init__()
+        self.scene = StartScene
         self.enemies = []
         for i in range(5):
             x = random.randint(20, 780)
@@ -74,6 +78,8 @@ class MainScene:
     def update(self, delta_time):
         delta_x = 0
         delta_y = 0
+        if check_pressed("q", self.pressed):
+            self.scene.draw()
         if not self.finished:
             if check_pressed("left", self.pressed):
                 delta_x -= 5
