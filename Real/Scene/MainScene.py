@@ -1,21 +1,33 @@
+#mainscene = 새로운 gauge 추가 - self.power_gauge = Guage(..)
+#self.character 에 attack_speed 공속 3 배 - constants 값을이용
+
+#challenge
+#power 버튼은 걍 쭉 게이지 감소
+#다 찰때까지 못씀
+
+#mainscene
+#not is using power and gauge.fill = 0.1 그럼 is using power
+
+#is_using_power가 켜지는 시점 - 최초로 power 버튼 누른때 and fill이 1.0
+
 import random
-from Enemy import Enemy
-from Character import Character
-from Timer import Timer
+from Components.Enemy import Enemy
+from Components.Character import Character
+from Components.Timer import Timer
+from Components.Gauge import Gauge
 from ScoreCalculator import ScoreCalculator
-import Bullet
+from Components import Bullet
 from Constants import *
 from Configure import *
 import arcade
 from Scene.BaseScene import BaseScene
-from Scene.StartScene import StartScene
+import Scene.SceneController as SceneController
 
 class MainScene(BaseScene):
     def __init__(self):
         super().__init__()
-        self.scene = StartScene
         self.enemies = []
-        for i in range(5):
+        for i in range(ENEMY_COUNT):
             x = random.randint(20, 780)
             y = random.randint(320, 580)
             enemy = Enemy(x, y)
@@ -29,11 +41,15 @@ class MainScene(BaseScene):
         self.recent_fire = 0
         self.enemy_bullets = []
         self.recent_enemy_fire = 0
+        self.shield_gauge = Gauge(100, 40, 150, 25)
+        self.power_gauge = Gauge(100, 80, 150, 25)
         self.timer = Timer(10, SCREEN_HEIGHT - 30)
         self.time = 0
         self.score = ScoreCalculator()
         self.total_score = 0
         self.finished = False
+        self.is_using_shield = False
+        self.is_using_power = False
 
     def draw(self):
         for bullet in self.enemy_bullets:
@@ -44,6 +60,9 @@ class MainScene(BaseScene):
         for bullet in self.bullets:
             bullet.draw()
         self.timer.draw()
+        self.shield_gauge.draw1()
+        self.power_gauge.draw2()
+
 
         arcade.draw_text(
             "Score: %6d" % (self.score.calculate(self.timer.time, False)),
@@ -79,7 +98,7 @@ class MainScene(BaseScene):
         delta_x = 0
         delta_y = 0
         if check_pressed("q", self.pressed):
-            self.scene.draw()
+            SceneController.to_start_scene()
         if not self.finished:
             if check_pressed("left", self.pressed):
                 delta_x -= 5
@@ -90,6 +109,28 @@ class MainScene(BaseScene):
             if check_pressed("down", self.pressed):
                 delta_y -= 5
             self.character.update(delta_x, delta_y)
+
+            if check_pressed("shield", self.pressed):
+                delta_shield = -delta_time * SHIELD_DECREASE
+                self.shield_gauge.update(delta_shield)
+                self.is_using_shield = self.shield_gauge.fill > 0
+            else:
+                delta_shield = delta_time * SHIELD_INCREASE
+                self.shield_gauge.update(delta_shield)
+                self.is_using_shield = False
+            self.character.is_shield_on = self.is_using_shield
+
+            if check_pressed2("power", self.pressed):
+                delta_power = -delta_time * POWER_DECREASE
+                self.power_gauge.update(delta_power)
+                self.is_using_power = self.power_gauge.fill > 0
+            elif self.power_gauge.fill == 0:
+                delta_power = 12 * POWER_INCREASE
+                self.power_gauge.update(delta_power)
+                self.is_using_power = False
+            self.character.is_power_on = self.is_using_power
+
+
         else:
             if check_pressed("r", self.pressed):
                 self.reset()
@@ -108,13 +149,22 @@ class MainScene(BaseScene):
             self.timer.update(delta_time)
 
         self.time += delta_time
-        if check_pressed("shoot", self.pressed) and not self.finished:
-            if self.recent_fire == 0 or self.recent_fire + self.character.attack_speed < self.time:
-                x = self.character.x
-                y = self.character.y + 15
-                bullet = Bullet.create_normal_bullet(x, y, (self.mouse_position[0] - x, self.mouse_position[1] - y))
-                self.bullets.append(bullet)
-                self.recent_fire = self.time
+        if self.is_using_power:
+            if check_pressed("shoot", self.pressed) and not self.finished:
+                if self.recent_fire == 0 or self.recent_fire + self.character.power_attack_speed < self.time:
+                    x = self.character.x
+                    y = self.character.y + 15
+                    bullet = Bullet.create_normal_bullet(x, y, (self.mouse_position[0] - x, self.mouse_position[1] - y))
+                    self.bullets.append(bullet)
+                    self.recent_fire = self.time
+        else:
+            if check_pressed("shoot", self.pressed) and not self.finished:
+                if self.recent_fire == 0 or self.recent_fire + self.character.attack_speed < self.time:
+                    x = self.character.x
+                    y = self.character.y + 15
+                    bullet = Bullet.create_normal_bullet(x, y, (self.mouse_position[0] - x, self.mouse_position[1] - y))
+                    self.bullets.append(bullet)
+                    self.recent_fire = self.time
 
         # 지금은 적 fire가 임시구현이라 하드코딩
         if not self.finished:
@@ -163,7 +213,8 @@ class MainScene(BaseScene):
             if abs(ebullet.x - self.character.x) < ebullet.size + self.character.size / 2 \
                     and abs(ebullet.y - self.character.y) < ebullet.size + self.character.size / 2:
                 ebullet.visible = False
-                self.character.visible = False
+                if not self.is_using_shield:
+                    self.character.visible = False
 
     def check_finish(self):
         if self.finished:

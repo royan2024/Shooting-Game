@@ -2,7 +2,7 @@
 #review
 
 from Scene.BaseScene import BaseScene
-from Scene.MainScene import MainScene
+import Scene.SceneController as SceneController
 from Constants import *
 from Configure import *
 import arcade
@@ -51,7 +51,7 @@ class StartScene(BaseScene):
             if self.mouse_inside():
                 #이제 막 떼어짐
                 if self.mouse_pressed and self.pressed_inside:
-                    arcade.get_window().scene_transition(MainScene())
+                    SceneController.to_main_scene()
             self.button_pressed = False
 
         self.mouse_pressed = len(set(BEHAVIOR["select"]) & set(self.pressed)) > 0

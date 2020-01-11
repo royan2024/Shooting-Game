@@ -10,7 +10,9 @@ BEHAVIOR = {
    "shoot": [MOUSE_BUTTON_LEFT, SPACE],
    "select": [MOUSE_BUTTON_LEFT],
    "r": [R],
-   "q": [Q]
+   "q": [Q],
+   "shield": [LSHIFT],
+   "power": [TAB]
 }
 
 def check_pressed(key, pressed):
@@ -18,3 +20,7 @@ def check_pressed(key, pressed):
        return False
    return len(set(BEHAVIOR[key]) & set(pressed)) > 0
 
+def check_pressed2(key, pressed):
+   if key not in BEHAVIOR:
+      return False
+   return len(set(BEHAVIOR[key])) > 0

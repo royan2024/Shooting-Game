@@ -1,6 +1,5 @@
 import arcade
-from Scene.MainScene import MainScene
-from Scene.StartScene import StartScene
+from Scene.SceneController import StartScene
 from Constants import *
 
 class Game(arcade.Window):
