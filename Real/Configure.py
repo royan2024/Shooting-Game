@@ -19,8 +19,3 @@ def check_pressed(key, pressed):
    if key not in BEHAVIOR:
        return False
    return len(set(BEHAVIOR[key]) & set(pressed)) > 0
-
-def check_pressed2(key, pressed):
-   if key not in BEHAVIOR:
-      return False
-   return len(set(BEHAVIOR[key])) > 0

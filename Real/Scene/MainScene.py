@@ -120,14 +120,18 @@ class MainScene(BaseScene):
                 self.is_using_shield = False
             self.character.is_shield_on = self.is_using_shield
 
-            if check_pressed2("power", self.pressed):
+            if check_pressed("power", self.pressed):
+                if not self.is_using_power:
+                    if self.power_gauge.fill == 1:
+                        self.is_using_power = True
+
+            if self.is_using_power:
                 delta_power = -delta_time * POWER_DECREASE
                 self.power_gauge.update(delta_power)
                 self.is_using_power = self.power_gauge.fill > 0
-            elif self.power_gauge.fill == 0:
-                delta_power = 12 * POWER_INCREASE
+            else:
+                delta_power = delta_time * POWER_INCREASE
                 self.power_gauge.update(delta_power)
-                self.is_using_power = False
             self.character.is_power_on = self.is_using_power
 
 
