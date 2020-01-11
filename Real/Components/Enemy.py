@@ -1,7 +1,6 @@
-import arcade
-import Bullet
+from Components import Bullet
 import random
-from Character import *
+from Components.Character import *
 
 
 class Enemy:
