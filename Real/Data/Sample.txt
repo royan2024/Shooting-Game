@@ -1,0 +1,4 @@
+Cindy 3000
+Roy 100000
+Teddy 50000
+Alex 1000
