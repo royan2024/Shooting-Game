@@ -22,6 +22,8 @@ from Configure import *
 import arcade
 from Scene.BaseScene import BaseScene
 import Scene.SceneController as SceneController
+import datetime
+from Scene.LeaderBoardScene import LeaderBoard
 
 class MainScene(BaseScene):
     def __init__(self):
@@ -98,7 +100,10 @@ class MainScene(BaseScene):
         delta_x = 0
         delta_y = 0
         if check_pressed("q", self.pressed):
-            SceneController.to_start_scene()
+            if self.finished:
+                SceneController.to_leaderboard_scene(self.create_name(), self.total_score)
+            else:
+                SceneController.to_start_scene()
         if not self.finished:
             if check_pressed("left", self.pressed):
                 delta_x -= 5
@@ -137,6 +142,7 @@ class MainScene(BaseScene):
 
         else:
             if check_pressed("r", self.pressed):
+                LeaderBoard(self.create_name(), self.total_score)
                 self.reset()
 
         for bullet in self.bullets:
@@ -250,3 +256,8 @@ class MainScene(BaseScene):
 
             self.__init__()
 
+    def create_name(self):
+        t = datetime.datetime.today()
+
+        name = str(t.date())[2:] + "-" + str(t.time()).split(".")[0]
+        return name
