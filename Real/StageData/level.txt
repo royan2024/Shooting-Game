@@ -1,0 +1,7 @@
+# data format
+# LEVEL 1
+# 1 3 5 7 9 --> each wave has n enemies
+LEVEL 1
+1 3 5 7 9
+LEVEL 2
+5 7 9 11 13

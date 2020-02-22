@@ -26,10 +26,31 @@ import datetime
 from Scene.LeaderBoardScene import LeaderBoard
 
 class MainScene(BaseScene):
-    def __init__(self):
+    def __init__(self, level=1):
         super().__init__()
+
+        self.level = level
+        self.wave = 0
+        self.enemy_in_waves = []
+
+        with open("StageData/level.txt") as f:
+            while True:
+                l = f.readline()
+                if len(l) == 0:
+                    break
+                if l[0] == "#":
+                    continue
+                #level 글자를 찾아야하고, level level 에 해당되는 줄 탐색
+                #enemies in waves 에 읽은 값을 추가
+                if l.find("LEVEL") == 0:
+                    if int(l.split()[1]) == self.level:
+                        l = f.readline()
+                        self.enemy_in_waves.extend(map(int, l.split()))
+        self.__init__internal(False)
+
+    def __init__internal(self, next_wave=True):
         self.enemies = []
-        for i in range(ENEMY_COUNT):
+        for i in range(self.enemy_in_waves[self.wave]):
             x = random.randint(20, 780)
             y = random.randint(320, 580)
             enemy = Enemy(x, y)
@@ -39,19 +60,28 @@ class MainScene(BaseScene):
         self.pressed = []
         self.mouse_position = (0, 0)
 
+        if next_wave:
+            for bullet in self.bullets:
+                bullet.visible = False
+            for ebullet in self.enemy_bullets:
+                ebullet.visible = False
+
         self.bullets = []
         self.recent_fire = 0
         self.enemy_bullets = []
         self.recent_enemy_fire = 0
-        self.shield_gauge = Gauge(100, 40, 150, 25)
-        self.power_gauge = Gauge(100, 80, 150, 25)
-        self.timer = Timer(10, SCREEN_HEIGHT - 30)
-        self.time = 0
-        self.score = ScoreCalculator()
-        self.total_score = 0
+
         self.finished = False
-        self.is_using_shield = False
-        self.is_using_power = False
+
+        if not next_wave:
+            self.shield_gauge = Gauge(100, 40, 150, 25)
+            self.power_gauge = Gauge(100, 80, 150, 25)
+            self.timer = Timer(10, SCREEN_HEIGHT - 30)
+            self.time = 0
+            self.score = ScoreCalculator()
+            self.total_score = 0
+            self.is_using_shield = False
+            self.is_using_power = False
 
     def draw(self):
         for bullet in self.enemy_bullets:
@@ -233,8 +263,12 @@ class MainScene(BaseScene):
         for enemy in self.enemies:
             is_win = is_win and not enemy.visible
         if is_win:
-            self.finished = True
-            self.total_score += self.score.calculate(self.timer.time, is_win)
+            if self.wave == len(self.enemy_in_waves) + 1:
+                self.finished = True
+                self.total_score += self.score.calculate(self.timer.time, is_win)
+            else:
+                self.wave += 1
+                self.__init__internal()
 
         if not self.character.visible:
             self.finished = True
