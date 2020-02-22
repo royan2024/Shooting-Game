@@ -1,4 +1,6 @@
 from Scene.BaseScene import BaseScene
+from Configure import *
+import Scene.SceneController as SceneController
 import os
 import arcade
 
@@ -31,7 +33,9 @@ class LeaderBoardScene(BaseScene):
             y -= 40
 
     def update(self, delta_time):
-        return
+        if check_pressed("q", self.pressed):
+            SceneController.to_start_scene()
+
 
 class LeaderBoard:
     def __init__(self, player_name=None, recent_score=None):
